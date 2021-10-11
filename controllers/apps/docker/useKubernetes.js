@@ -5,7 +5,7 @@ const logger = new Logger();
 const loadConfig = require('../../../utils/loadConfig');
 
 const useKubernetes = async (apps) => {
-  const { useOrdering: orderType, unpinStoppedApps } = await loadConfig();
+  const { useOrdering: orderType } = await loadConfig();
 
   let ingresses = null;
 
@@ -21,10 +21,6 @@ const useKubernetes = async (apps) => {
   }
 
   if (ingresses) {
-    apps = await App.findAll({
-      order: [[orderType, 'ASC']],
-    });
-
     ingresses = ingresses.filter(
       (e) => Object.keys(e.metadata.annotations).length !== 0
     );
@@ -43,28 +39,17 @@ const useKubernetes = async (apps) => {
           name: annotations['flame.pawelmalak/name'],
           url: annotations['flame.pawelmalak/url'],
           icon: annotations['flame.pawelmalak/icon'] || 'kubernetes',
+          isPinned: annotations['flame.pawelmalak/unpinned'] || true,
+          isPublic: annotations['flame.pawelmalak/private'] || true,
+          description: annotations['flame.pawelmalak/description'] || ''
         });
       }
     }
 
-    if (unpinStoppedApps) {
-      for (const app of apps) {
-        await app.update({ isPinned: false });
-      }
-    }
-
-    for (const item of kubernetesApps) {
-      if (apps.some((app) => app.name === item.name)) {
-        const app = apps.find((a) => a.name === item.name);
-        await app.update({ ...item, isPinned: true });
-      } else {
-        await App.create({
-          ...item,
-          isPinned: true,
-        });
-      }
-    }
+    return kubernetesApps.sort((a, b) => { return a.name === b.name ? 0 : a.name > b.name ? 1 : -1 })
   }
+
+  return []
 };
 
 module.exports = useKubernetes;

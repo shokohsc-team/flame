@@ -13,8 +13,6 @@ spec:
         app: flame
     spec:
       serviceAccountName: flame
-      securityContext:
-        fsGroup: 1000
       containers:
         - name: flame
           image: shokohsc/flame
@@ -26,3 +24,13 @@ spec:
             httpGet:
               path: /
               port: http
+          livenessProbe:
+            tcpSocket:
+              port: http
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64M
+            limits:
+              cpu: 500m
+              memory: 512M

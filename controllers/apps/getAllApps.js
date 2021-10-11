@@ -15,14 +15,14 @@ const getAllApps = asyncWrapper(async (req, res, next) => {
     kubernetesApps: useKubernetesAPI,
   } = await loadConfig();
 
-  let apps;
+  let apps = [];
 
   if (useDockerAPI) {
     await useDocker(apps);
   }
 
   if (useKubernetesAPI) {
-    await useKubernetes(apps);
+    apps = await useKubernetes(apps);
   }
 
   // apps visibility
@@ -32,11 +32,6 @@ const getAllApps = asyncWrapper(async (req, res, next) => {
     orderType == 'name'
       ? [[Sequelize.fn('lower', Sequelize.col('name')), 'ASC']]
       : [[orderType, 'ASC']];
-
-  apps = await App.findAll({
-    order,
-    where,
-  });
 
   if (process.env.NODE_ENV === 'production') {
     // Set header to fetch containers info every time

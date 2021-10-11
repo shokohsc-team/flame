@@ -1,4 +1,4 @@
-apiVersion: skaffold/v2beta20
+apiVersion: skaffold/v2beta26
 kind: Config
 metadata:
   name: flame
@@ -11,7 +11,7 @@ build:
       - src: controllers/*.js
         dest: .
     docker:
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile
 deploy:
   kustomize:
     paths:
@@ -28,7 +28,7 @@ profiles:
         - src: controllers/*.js
           dest: .
       docker:
-        dockerfile: Dockerfile.dev
+        dockerfile: Dockerfile
 - name: shokohsc
   build:
     artifacts:
@@ -38,14 +38,21 @@ profiles:
         - src: controllers/*.js
           dest: .
       kaniko:
-        dockerfile: Dockerfile.dev
         cache:
           repo: shokohsc/flame
+        dockerfile: Dockerfile
     cluster:
       dockerConfig:
         secretName: kaniko-secret
       namespace: kaniko
       pullSecretName: kaniko-secret
+      resources:
+        requests:
+          cpu: 1
+          memory: 1Gi
+        limits:
+          cpu: 2
+          memory: 2Gi
   deploy:
     kustomize:
       paths:
@@ -55,11 +62,18 @@ profiles:
     artifacts:
     - image: shokohsc/flame
       kaniko:
-        dockerfile: Dockerfile
         cache:
           repo: shokohsc/flame
+        dockerfile: Dockerfile
     cluster:
       dockerConfig:
         secretName: kaniko-secret
       namespace: kaniko
       pullSecretName: kaniko-secret
+      resources:
+        requests:
+          cpu: 1
+          memory: 1Gi
+        limits:
+          cpu: 2
+          memory: 2Gi

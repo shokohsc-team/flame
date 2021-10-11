@@ -6,13 +6,13 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: nginx
     cert-manager.io/cluster-issuer: ca-cluster-issuer
-    flame.pawelmalak/name: flame
-    flame.pawelmalak/url: dev.flame.shokohsc.home
+    flame.pawelmalak/name: dev-flame
+    flame.pawelmalak/url: flame.dev.shokohsc.home
     flame.pawelmalak/type: app
-    flame.pawelmalak/icon: fire
+    flame.pawelmalak/icon: wrench
 spec:
   rules:
-  - host: dev.flame.shokohsc.home
+  - host: flame.dev.shokohsc.home
     http:
       paths:
       - path: /
@@ -24,5 +24,5 @@ spec:
               number: 80
   tls:
   - hosts:
-    - dev.flame.shokohsc.home
+    - flame.dev.shokohsc.home
     secretName: flame-cert
